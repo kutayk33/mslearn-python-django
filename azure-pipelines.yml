@@ -68,20 +68,20 @@ stages:
     py.cleanup Tests/
   displayName: 'Run unit tests'
 
-- task: PublishTestResults@2
+    - task: PublishTestResults@2
   inputs:        
     searchFolder: $(System.DefaultWorkingDirectory)
     testResultsFiles: '**/test-*.xml'
   displayName: 'Publish test results'
 
-- publish: $(System.DefaultWorkingDirectory)/Tests
+    - publish: $(System.DefaultWorkingDirectory)/Tests
   artifact: tests
-- stage: Deploy
+    - stage: Deploy
   displayName: 'Deploy Web App'
   dependsOn: Build
   condition: succeeded()
   jobs:
-  - deployment: DeploymentJob
+    - deployment: DeploymentJob
     pool:
       vmImage: $(vmImageName)
     environment: $(environmentName)
@@ -101,14 +101,14 @@ stages:
               azureSubscription: $(azureServiceConnectionId)
               appName: $(webAppName)
               package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
-- script: |
+    - script: |
     pip install selenium
     pip install pytest
     pytest tests/functional_tests/ --webAppUrl=https://$(webAppName).azurewebsites.net --junitxml=$(System.DefaultWorkingDirectory)/TestResults/test-results-functional.xml
   workingDirectory: $(Pipeline.Workspace)
   displayName: 'Run functional tests'
 
-- task: PublishTestResults@2
+    - task: PublishTestResults@2
   inputs:
     searchFolder: $(Pipeline.Workspace)
     testResultsFiles: '**/test-*.xml'
